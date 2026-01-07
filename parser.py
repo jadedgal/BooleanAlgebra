@@ -6,5 +6,4 @@ class parser:
         self.string = string
         return
     
-    def stringTokens(self):
-        return
+    
