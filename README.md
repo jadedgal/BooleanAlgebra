@@ -7,3 +7,5 @@ Idk im kinda excited about it! HELLO FUTURE ME :3
 * XOR: "
 
 All brackets must be the normal kind "()"; **NOT** curly **nor** square.
+
+I also want it to be more of a rewrite engine which uses boolean algebra laws to simplify, rather than a K-map, because it's more intellectually challenging and it's more human-like, which may mean I may later be able to make a walk-through mode
