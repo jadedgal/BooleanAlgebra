@@ -76,15 +76,26 @@ class AST:
             else:
                 flat.append(a)
         args = flat
+        
+        #A.A = A
+        nargs = []
+        for a in args:
+            for b in args:
+                if isinstance(a, Variable) and isinstance(b, Variable) and b.name == a.name and b != a:
+                    args.remove(b)
+                
 
         # x . 0 -> 0
         if any(isinstance(a, Constant) and a.value == 0 for a in args):
             return Constant(0)
 
         # x . 1 -> x
+        nargs = []
         for a in args:
             if isinstance(a, Constant) and a.value == 1:
-                args.remove(a)
+                continue
+            nargs.append(a)
+        args = nargs
 
         # x . !x -> 0
         for a in args:
