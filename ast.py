@@ -20,13 +20,13 @@ class AST:
             return str(node.value)
         if isinstance(node, Not):
             # ! has highest precedence, always prefix
-            return f"!{self.getString(node.args[0])}"
+            return f"Not({self.getString(node.args[0])})"
         if isinstance(node, And):
-            return "(" + ".".join(self.getString(a) for a in node.args) + ")"
+            return "AND(" + ",".join(self.getString(a) for a in node.args) + ")"
         if isinstance(node, Or):
-            return "(" + "+".join(self.getString(a) for a in node.args) + ")"
+            return "OR(" + ",".join(self.getString(a) for a in node.args) + ")"
         if isinstance(node, Xor):
-            return "(" + '"'.join(self.getString(a) for a in node.args) + ")"
+            return "XOR(" + ','.join(self.getString(a) for a in node.args) + ")"
         return str(node)
         
     def rewrite(self):
@@ -68,6 +68,8 @@ class AST:
     def rewriteAnd(self, args: list[Node]) -> Node:
         # Flatten
         flat = []
+        if len(args) < 2:
+            raise SyntaxError("AND requires at least 2 arguments")
         for a in args:
             if isinstance(a, And):
                 flat.extend(a.args)
@@ -80,11 +82,13 @@ class AST:
             return Constant(0)
 
         # x . 1 -> x
-        args = [a for a in args if not (isinstance(a, Constant) and a.value == 1)]
+        for a in args:
+            if isinstance(a, Constant) and a.value == 1:
+                args.remove(a)
 
         # x . !x -> 0
         for a in args:
-            if any(isinstance(b, Not) and b.args[0] == a for b in args):
+            if any(isinstance(b, Not) and isinstance(b.args[0],Variable) and isinstance(a,Variable) and b.args[0].name == a.name for b in args):
                 return Constant(0)
 
         # remove duplicates
@@ -100,6 +104,8 @@ class AST:
     def rewriteOr(self, args: list[Node]) -> Node:
         # Flatten
         flat = []
+        if len(args) < 2:
+            raise SyntaxError("OR requires at least 2 arguments")
         for a in args:
             if isinstance(a, Or):
                 flat.extend(a.args)
